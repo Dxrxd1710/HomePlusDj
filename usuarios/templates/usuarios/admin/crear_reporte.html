@@ -1,0 +1,51 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+{% block titulo %}Crear reporte{% endblock %}
+{% block page_title %}Crear reporte{% endblock %}
+{% block nav_reportes %}active{% endblock %}
+
+{% block content %}
+<div style="max-width:560px;">
+    <div style="margin-bottom:16px;">
+        <a href="{% url 'usuarios:admin_reportes' %}" class="btn btn-outline btn-sm">← Volver</a>
+    </div>
+
+    <div class="card">
+        <div class="card-title" style="margin-bottom:20px;">Nuevo reporte</div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Título del reporte</label>
+                <input type="text" name="titulo" class="form-control" placeholder="Ej: Resumen mensual Mayo 2025" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Tipo de reporte</label>
+                <select name="tipo" class="form-control">
+                    <option value="general">📊 Reporte general</option>
+                    <option value="usuarios">👥 Reporte de usuarios</option>
+                    <option value="profesionales">🔧 Reporte de profesionales</option>
+                    <option value="pendientes">⏳ Cuentas pendientes</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label>Descripción / notas (opcional)</label>
+                <textarea name="descripcion" class="form-control" placeholder="Notas adicionales sobre este reporte..."></textarea>
+            </div>
+
+            <!-- Info de qué incluye cada tipo -->
+            <div style="background:var(--gold-dim);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:20px;font-size:0.82rem;color:var(--muted2);line-height:1.7;">
+                <div style="color:var(--gold);font-weight:600;margin-bottom:6px;">¿Qué incluye cada tipo?</div>
+                <b style="color:#fff;">General:</b> totales de usuarios, clientes, profesionales, servicios y registros de 30 días.<br>
+                <b style="color:#fff;">Usuarios:</b> totales por estado, registros últimos 30 días.<br>
+                <b style="color:#fff;">Profesionales:</b> totales y distribución por tipo de servicio.<br>
+                <b style="color:#fff;">Pendientes:</b> lista de cuentas esperando aprobación.
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width:100%;">Generar reporte</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

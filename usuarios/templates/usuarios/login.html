@@ -1,0 +1,52 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+{% block titulo %}- Iniciar sesión{% endblock %}
+{% block bg_image %}{% static 'usuarios/fondo3.jpg' %}{% endblock %}
+
+{% block hero %}
+<div class="hero-left">
+    <h1>Tu hogar,<br><em>en buenas manos.</em></h1>
+    <p>Conectamos a clientes con los mejores profesionales del hogar. Rápido, seguro y confiable.</p>
+    <ul class="feature-list">
+        <li>Profesionales verificados</li>
+        <li>Pagos protegidos</li>
+        <li>Reseñas reales de clientes</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h2>Iniciar sesión</h2>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.correo.id_for_label }}">Correo electrónico</label>
+        {{ form.correo }}
+        {% if form.correo.errors %}<ul class="errorlist">{% for e in form.correo.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Contraseña</label>
+        {{ form.password }}
+        {% if form.password.errors %}<ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <button type="submit" class="btn">Ingresar</button>
+</form>
+
+<div class="links">
+    <a href="{% url 'usuarios:recuperar_password' %}">¿Olvidaste tu contraseña?</a>
+    <div class="divider">·</div>
+    <a href="{% url 'usuarios:registro' %}">Crear cuenta nueva</a>
+</div>
+{% endblock %}

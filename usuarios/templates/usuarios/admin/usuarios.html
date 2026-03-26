@@ -1,0 +1,139 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+{% block titulo %}Usuarios{% endblock %}
+{% block page_title %}Gestión de usuarios{% endblock %}
+{% block nav_usuarios %}active{% endblock %}
+
+{% block content %}
+
+<!-- FILTROS -->
+<form method="GET" style="margin-bottom:20px;">
+    <div class="form-row">
+        <div class="form-group" style="flex:2;">
+            <label>Buscar</label>
+            <input name="q" value="{{ q }}" class="form-control" placeholder="Nombre, apellido, correo...">
+        </div>
+        <div class="form-group">
+            <label>Tipo</label>
+            <select name="tipo" class="form-control">
+                <option value="">Todos</option>
+                <option value="cliente"      {% if tipo == 'cliente' %}selected{% endif %}>Cliente</option>
+                <option value="profesional"  {% if tipo == 'profesional' %}selected{% endif %}>Profesional</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Estado</label>
+            <select name="estado" class="form-control">
+                <option value="">Todos</option>
+                <option value="pendiente"  {% if estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="aprobado"   {% if estado == 'aprobado' %}selected{% endif %}>Aprobado</option>
+                <option value="rechazado"  {% if estado == 'rechazado' %}selected{% endif %}>Rechazado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Activación</label>
+            <select name="activo" class="form-control">
+                <option value="">Todos</option>
+                <option value="1" {% if activo == '1' %}selected{% endif %}>Activado</option>
+                <option value="0" {% if activo == '0' %}selected{% endif %}>Sin activar</option>
+            </select>
+        </div>
+        <div class="form-group" style="justify-content:flex-end;">
+            <button type="submit" class="btn btn-gold">Filtrar</button>
+            <a href="{% url 'usuarios:admin_usuarios' %}" class="btn btn-outline" style="margin-top:4px;">Limpiar</a>
+        </div>
+    </div>
+</form>
+
+<!-- TABLA CON ACCIONES MASIVAS -->
+<div class="card">
+    <div class="section-head">
+        <h2>{{ total }} usuario{{ total|pluralize }}</h2>
+        <div style="display:flex;gap:8px;">
+            <button onclick="accionMasiva('aprobar')" class="btn btn-green btn-sm">✓ Aprobar selección</button>
+            <button onclick="accionMasiva('rechazar')" class="btn btn-red btn-sm">✕ Rechazar selección</button>
+        </div>
+    </div>
+
+    <form id="formMasivo" method="POST" action="{% url 'usuarios:admin_aprobar_masivo' %}">
+        {% csrf_token %}
+        <input type="hidden" name="accion" id="accion-masiva">
+
+        {% if usuarios %}
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all" title="Seleccionar todos"></th>
+                    <th>Usuario</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Activado</th>
+                    <th>Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td><input type="checkbox" name="ids" value="{{ u.id_usuario }}" class="row-check"></td>
+                <td>
+                    <div style="font-weight:500;color:#fff;">{{ u.nombre }} {{ u.apellido }}</div>
+                    <div style="font-size:0.75rem;color:var(--muted);">{{ u.correo }}</div>
+                </td>
+                <td><span class="badge badge-{{ u.tipo_usuario }}">{{ u.get_tipo_usuario_display }}</span></td>
+                <td><span class="badge badge-{{ u.estado_cuenta }}">{{ u.get_estado_cuenta_display }}</span></td>
+                <td>
+                    {% if u.activo %}
+                        <span class="badge badge-activo">✓ Sí</span>
+                    {% else %}
+                        <span class="badge badge-inactivo">✕ No</span>
+                    {% endif %}
+                </td>
+                <td style="color:var(--muted);font-size:0.8rem;">{{ u.fecha_registro|date:"d/m/Y" }}</td>
+                <td>
+                    <div style="display:flex;gap:5px;">
+                        <a href="{% url 'usuarios:admin_usuario_detalle' u.id_usuario %}" class="btn btn-outline btn-sm" title="Ver detalle">👁</a>
+                        {% if u.estado_cuenta != 'aprobado' %}
+                        <a href="{% url 'usuarios:admin_aprobar' u.id_usuario %}" class="btn btn-green btn-sm" title="Aprobar">✓</a>
+                        {% endif %}
+                        {% if u.estado_cuenta != 'rechazado' %}
+                        <a href="{% url 'usuarios:admin_rechazar' u.id_usuario %}" class="btn btn-red btn-sm" title="Rechazar">✕</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="empty">
+            <div class="icon">🔍</div>
+            <p>No se encontraron usuarios con esos filtros.</p>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Seleccionar todos
+document.getElementById('select-all').addEventListener('change', function() {
+    document.querySelectorAll('.row-check').forEach(c => c.checked = this.checked);
+});
+
+function accionMasiva(accion) {
+    const seleccionados = document.querySelectorAll('.row-check:checked');
+    if (seleccionados.length === 0) {
+        alert('Selecciona al menos un usuario.');
+        return;
+    }
+    const verbo = accion === 'aprobar' ? 'aprobar' : 'rechazar';
+    if (!confirm(`¿Confirmas ${verbo} ${seleccionados.length} usuario(s)?`)) return;
+    document.getElementById('accion-masiva').value = accion;
+    document.getElementById('formMasivo').submit();
+}
+</script>
+{% endblock %}

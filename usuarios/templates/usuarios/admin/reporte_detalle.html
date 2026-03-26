@@ -1,0 +1,154 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+{% block titulo %}{{ reporte.titulo }}{% endblock %}
+{% block page_title %}{{ reporte.titulo }}{% endblock %}
+{% block nav_reportes %}active{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+    <a href="{% url 'usuarios:admin_reportes' %}" class="btn btn-outline btn-sm">← Volver</a>
+    <span class="badge badge-profesional">{{ reporte.get_tipo_display }}</span>
+    <span style="font-size:0.78rem;color:var(--muted);">
+        Generado el {{ reporte.fecha_creacion|date:"d/m/Y \a \l\a\s H:i" }}
+        {% if reporte.creado_por %} por {{ reporte.creado_por.nombre }}{% endif %}
+    </span>
+    <a href="{% url 'usuarios:admin_eliminar_reporte' reporte.pk %}"
+       onclick="return confirm('¿Eliminar este reporte?')"
+       class="btn btn-red btn-sm" style="margin-left:auto;">🗑 Eliminar</a>
+</div>
+
+{% if reporte.descripcion %}
+<div class="card" style="margin-bottom:20px;font-size:0.88rem;color:var(--muted2);">
+    {{ reporte.descripcion }}
+</div>
+{% endif %}
+
+<!-- STATS GENERALES -->
+<div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card">
+        <div class="stat-icon gold">👥</div>
+        <div><div class="stat-value">{{ datos.total_usuarios|default:"0" }}</div><div class="stat-label">Total usuarios</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue">🏠</div>
+        <div><div class="stat-value" style="color:#8ec1e8">{{ datos.clientes|default:"0" }}</div><div class="stat-label">Clientes</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon gold">🔧</div>
+        <div><div class="stat-value" style="color:var(--gold)">{{ datos.profesionales|default:"0" }}</div><div class="stat-label">Profesionales</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">⏳</div>
+        <div><div class="stat-value" style="color:#e0a95a">{{ datos.pendientes|default:"0" }}</div><div class="stat-label">Pendientes</div></div>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:24px;">
+    <!-- Gráfica registros 30 días (si existe) -->
+    {% if datos.registros_30_dias %}
+    <div class="card">
+        <div class="card-title">Registros últimos 30 días</div>
+        <canvas id="chart30" height="160"></canvas>
+    </div>
+    {% endif %}
+
+    <!-- Gráfica de estados -->
+    <div class="card">
+        <div class="card-title">Distribución por estado</div>
+        <canvas id="chartEstados" height="160"></canvas>
+    </div>
+</div>
+
+<!-- Servicios (si existen) -->
+{% if datos.servicios %}
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-title" style="margin-bottom:16px;">Distribución de servicios profesionales</div>
+    <canvas id="chartServicios" height="100"></canvas>
+</div>
+{% endif %}
+
+<!-- Lista de pendientes (si existe) -->
+{% if datos.lista_pendientes %}
+<div class="card">
+    <div class="section-head"><h2>Lista de cuentas pendientes</h2></div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Tipo</th><th>Registrado</th></tr></thead>
+        <tbody>
+        {% for p in datos.lista_pendientes %}
+        <tr>
+            <td style="color:#fff;">{{ p.nombre }} {{ p.apellido }}</td>
+            <td style="color:var(--muted);">{{ p.correo }}</td>
+            <td><span class="badge badge-{{ p.tipo_usuario }}">{{ p.tipo_usuario|capfirst }}</span></td>
+            <td style="color:var(--muted);font-size:0.8rem;">{{ p.fecha_registro }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const datos = {{ datos_json|safe }};
+const gold = '#C9A84C', goldD = 'rgba(201,168,76,0.2)';
+const gridColor = 'rgba(255,255,255,0.04)', tickColor = '#7A7468';
+const defaultOptions = (stacked=false) => ({
+    responsive: true,
+    plugins: { legend: { labels: { color: '#B0A898', font: { size: 10 } } } },
+    scales: {
+        x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 9 } }, stacked },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 9 } }, beginAtZero: true, stacked }
+    }
+});
+
+// Gráfica 30 días
+if (datos.registros_30_dias) {
+    new Chart(document.getElementById('chart30').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: datos.registros_30_dias.map(d => d.dia),
+            datasets: [{ label: 'Registros', data: datos.registros_30_dias.map(d => d.cantidad),
+                borderColor: gold, backgroundColor: goldD, borderWidth: 2, fill: true,
+                tension: 0.4, pointBackgroundColor: gold, pointRadius: 2 }]
+        },
+        options: defaultOptions()
+    });
+}
+
+// Estados
+new Chart(document.getElementById('chartEstados').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Aprobados', 'Pendientes', 'Rechazados'],
+        datasets: [{ data: [datos.aprobados||0, datos.pendientes||0, datos.rechazados||0],
+            backgroundColor: ['rgba(78,201,148,0.7)', 'rgba(212,144,58,0.7)', 'rgba(224,82,82,0.7)'],
+            borderColor: ['#0A0A08'], borderWidth: 2 }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { color: '#B0A898', font: { size: 10 }, padding: 16 } } },
+        cutout: '60%'
+    }
+});
+
+// Servicios
+if (datos.servicios && document.getElementById('chartServicios')) {
+    new Chart(document.getElementById('chartServicios').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: datos.servicios.map(s => s.servicio),
+            datasets: [{ label: 'Profesionales', data: datos.servicios.map(s => s.total),
+                backgroundColor: goldD, borderColor: gold, borderWidth: 1.5, borderRadius: 5 }]
+        },
+        options: { ...defaultOptions(), indexAxis: 'y' }
+    });
+}
+</script>
+{% endblock %}

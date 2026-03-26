@@ -1,0 +1,22 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+{% block titulo %}- Cuenta activada{% endblock %}
+{% block bg_image %}{% static 'usuarios/fondo.jpg' %}{% endblock %}
+{% block wrapper_class %}centered{% endblock %}
+
+{% block content %}
+<div style="text-align:center;padding:10px 0 20px;">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px;">✓</div>
+    <h2 style="color:var(--gold);">¡Cuenta activada!</h2>
+    <p style="color:var(--text-muted);margin:12px 0 6px;font-size:0.92rem;">
+        Hola <strong style="color:#fff;">{{ usuario.nombre }}</strong>, tu correo fue verificado correctamente.
+    </p>
+    <p style="color:var(--text-muted);font-size:0.84rem;margin-bottom:28px;line-height:1.6;">
+        Tu cuenta está <span style="color:var(--warning);">pendiente de aprobación</span> por el administrador.<br>
+        Te notificaremos cuando sea aprobada.
+    </p>
+    <a href="{% url 'usuarios:login' %}">
+        <button class="btn" style="max-width:260px;margin:0 auto;">Ir al inicio de sesión</button>
+    </a>
+</div>
+{% endblock %}

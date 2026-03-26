@@ -1,0 +1,165 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+{% block titulo %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- STATS GRID -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon gold">👥</div>
+        <div><div class="stat-value">{{ stats.total }}</div><div class="stat-label">Usuarios totales</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">⏳</div>
+        <div><div class="stat-value" style="color:#e0a95a">{{ stats.pendientes }}</div><div class="stat-label">Pendientes de aprobación</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div><div class="stat-value" style="color:#4ec994">{{ stats.aprobados }}</div><div class="stat-label">Aprobados</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue">📅</div>
+        <div><div class="stat-value" style="color:#8ec1e8">{{ stats.hoy }}</div><div class="stat-label">Registros hoy</div></div>
+    </div>
+</div>
+
+<!-- FILA 2 -->
+<div class="grid-2" style="margin-bottom:24px;">
+
+    <!-- Gráfica de registros -->
+    <div class="card">
+        <div class="card-title">Registros últimos 7 días</div>
+        <canvas id="chartSemana" height="140"></canvas>
+    </div>
+
+    <!-- Mini stats -->
+    <div class="card">
+        <div class="card-title">Resumen de usuarios</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px;">
+            {% include 'usuarios/admin/_stat_row.html' with label="Clientes" value=stats.clientes color="#8ec1e8" icon="🏠" %}
+            {% include 'usuarios/admin/_stat_row.html' with label="Profesionales" value=stats.profesionales color="#C9A84C" icon="🔧" %}
+            {% include 'usuarios/admin/_stat_row.html' with label="Sin activar correo" value=stats.sin_activar color="#e0a95a" icon="📧" %}
+            {% include 'usuarios/admin/_stat_row.html' with label="Rechazados" value=stats.rechazados color="#f08080" icon="❌" %}
+        </div>
+    </div>
+</div>
+
+<!-- FILA 3 -->
+<div class="grid-2" style="margin-bottom:24px;">
+
+    <!-- Pendientes de aprobación -->
+    <div class="card">
+        <div class="section-head">
+            <h2>Pendientes de aprobación</h2>
+            <a href="{% url 'usuarios:admin_usuarios' %}?estado=pendiente&activo=1" class="btn btn-outline btn-sm">Ver todos</a>
+        </div>
+        {% if ultimos_pendientes %}
+        <div class="table-wrap">
+        <table>
+            <thead><tr><th>Usuario</th><th>Tipo</th><th>Acciones</th></tr></thead>
+            <tbody>
+            {% for u in ultimos_pendientes %}
+            <tr>
+                <td>
+                    <div style="font-weight:500;color:#fff;">{{ u.nombre }} {{ u.apellido }}</div>
+                    <div style="font-size:0.75rem;color:var(--muted);">{{ u.correo }}</div>
+                </td>
+                <td><span class="badge badge-{{ u.tipo_usuario }}">{{ u.get_tipo_usuario_display }}</span></td>
+                <td style="display:flex;gap:6px;">
+                    <a href="{% url 'usuarios:admin_aprobar' u.id_usuario %}" class="btn btn-green btn-sm">✓</a>
+                    <a href="{% url 'usuarios:admin_rechazar' u.id_usuario %}" class="btn btn-red btn-sm">✕</a>
+                    <a href="{% url 'usuarios:admin_usuario_detalle' u.id_usuario %}" class="btn btn-outline btn-sm">👁</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="empty"><div class="icon">🎉</div><p>No hay cuentas pendientes</p></div>
+        {% endif %}
+    </div>
+
+    <!-- Servicios más registrados -->
+    <div class="card">
+        <div class="card-title">Servicios más registrados</div>
+        {% if servicios %}
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+            {% for s in servicios %}
+            <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:5px;">
+                    <span style="color:var(--muted2);">{{ s.servicio|capfirst }}</span>
+                    <span style="color:var(--gold);font-weight:600;">{{ s.total }}</span>
+                </div>
+                <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:4px;">
+                    <div style="height:4px;background:var(--gold);border-radius:4px;width:{% widthratio s.total servicios.0.total 100 %}%;opacity:0.8;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty"><div class="icon">🔧</div><p>Sin profesionales registrados</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Últimos reportes -->
+{% if ultimos_reportes %}
+<div class="card">
+    <div class="section-head">
+        <h2>Reportes recientes</h2>
+        <a href="{% url 'usuarios:admin_reportes' %}" class="btn btn-outline btn-sm">Ver todos</a>
+    </div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Título</th><th>Tipo</th><th>Creado</th><th></th></tr></thead>
+        <tbody>
+        {% for r in ultimos_reportes %}
+        <tr>
+            <td style="color:#fff;font-weight:500;">{{ r.titulo }}</td>
+            <td><span class="badge badge-profesional">{{ r.get_tipo_display }}</span></td>
+            <td style="color:var(--muted);font-size:0.8rem;">{{ r.fecha_creacion|date:"d/m/Y H:i" }}</td>
+            <td><a href="{% url 'usuarios:admin_reporte_detalle' r.pk %}" class="btn btn-outline btn-sm">Ver</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const semana = {{ semana_json|safe }};
+const ctx = document.getElementById('chartSemana').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: semana.map(d => d.dia),
+        datasets: [{
+            data: semana.map(d => d.cantidad),
+            backgroundColor: 'rgba(201,168,76,0.25)',
+            borderColor: '#C9A84C',
+            borderWidth: 1.5,
+            borderRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7A7468', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7A7468', stepSize: 1, font: { size: 10 } }, beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}

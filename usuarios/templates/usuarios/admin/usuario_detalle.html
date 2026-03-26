@@ -1,0 +1,108 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+{% block titulo %}Detalle usuario{% endblock %}
+{% block page_title %}Detalle de usuario{% endblock %}
+{% block nav_usuarios %}active{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:16px;">
+    <a href="{% url 'usuarios:admin_usuarios' %}" class="btn btn-outline btn-sm">← Volver a usuarios</a>
+</div>
+
+<div class="grid-2" style="align-items:start;">
+
+    <!-- INFO PERSONAL -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                <div style="width:52px;height:52px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:var(--gold);">
+                    {{ usuario.nombre|first|upper }}
+                </div>
+                <div>
+                    <div style="font-size:1.1rem;font-weight:600;color:#fff;">{{ usuario.nombre }} {{ usuario.apellido }}</div>
+                    <div style="font-size:0.8rem;color:var(--muted);">ID #{{ usuario.id_usuario }}</div>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:6px;">
+                    <span class="badge badge-{{ usuario.tipo_usuario }}">{{ usuario.get_tipo_usuario_display }}</span>
+                    <span class="badge badge-{{ usuario.estado_cuenta }}">{{ usuario.get_estado_cuenta_display }}</span>
+                </div>
+            </div>
+
+            {% include 'usuarios/admin/_info_row.html' with label="Correo" value=usuario.correo %}
+            {% include 'usuarios/admin/_info_row.html' with label="Teléfono" value=usuario.telefono %}
+            {% include 'usuarios/admin/_info_row.html' with label="Dirección" value=usuario.direccion %}
+            {% include 'usuarios/admin/_info_row.html' with label="Registrado" value=usuario.fecha_registro|date:"d/m/Y H:i" %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border2);">
+                <span style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Correo activado</span>
+                {% if usuario.activo %}
+                    <span class="badge badge-activo">✓ Activado</span>
+                {% else %}
+                    <span class="badge badge-inactivo">✕ Sin activar</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PERFIL PROFESIONAL -->
+        {% if perfil %}
+        <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">Perfil profesional</div>
+            {% include 'usuarios/admin/_info_row.html' with label="Servicio" value=perfil.get_servicio_display %}
+            {% include 'usuarios/admin/_info_row.html' with label="Experiencia" value=perfil.anos_experiencia|stringformat:"s años" %}
+            <div style="padding:10px 0;border-bottom:1px solid var(--border2);">
+                <div style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Descripción</div>
+                <p style="font-size:0.86rem;color:var(--muted2);line-height:1.6;">{{ perfil.servicio_descripcion }}</p>
+            </div>
+            <div style="padding:10px 0;border-bottom:1px solid var(--border2);">
+                <div style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Historial</div>
+                <p style="font-size:0.86rem;color:var(--muted2);line-height:1.6;white-space:pre-line;">{{ perfil.historial }}</p>
+            </div>
+            {% if perfil.certificaciones %}
+            <div style="padding:10px 0;">
+                <div style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Certificaciones</div>
+                <p style="font-size:0.86rem;color:var(--muted2);line-height:1.6;white-space:pre-line;">{{ perfil.certificaciones }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="card" style="position:sticky;top:78px;">
+        <div class="card-title" style="margin-bottom:16px;">Acciones</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            {% if usuario.estado_cuenta != 'aprobado' %}
+            <a href="{% url 'usuarios:admin_aprobar' usuario.id_usuario %}" class="btn btn-green" style="justify-content:center;">
+                ✓ Aprobar cuenta
+            </a>
+            {% endif %}
+            {% if usuario.estado_cuenta != 'rechazado' %}
+            <a href="{% url 'usuarios:admin_rechazar' usuario.id_usuario %}" class="btn btn-red" style="justify-content:center;">
+                ✕ Rechazar cuenta
+            </a>
+            {% endif %}
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border2);">
+            <div class="card-title">Estado actual</div>
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.84rem;">
+                    <span style="color:var(--muted);">Cuenta</span>
+                    <span class="badge badge-{{ usuario.estado_cuenta }}">{{ usuario.get_estado_cuenta_display }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.84rem;">
+                    <span style="color:var(--muted);">Email</span>
+                    {% if usuario.activo %}
+                        <span class="badge badge-activo">Activado</span>
+                    {% else %}
+                        <span class="badge badge-inactivo">Sin activar</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.84rem;">
+                    <span style="color:var(--muted);">Tipo</span>
+                    <span class="badge badge-{{ usuario.tipo_usuario }}">{{ usuario.get_tipo_usuario_display }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

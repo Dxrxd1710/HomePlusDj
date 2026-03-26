@@ -1,0 +1,118 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+{% block titulo %}- Registro{% endblock %}
+{% block bg_image %}{% static 'usuarios/fondo2.jpg' %}{% endblock %}
+{% block card_class %}card-wide{% endblock %}
+
+{% block hero %}
+<div class="hero-left">
+    <h1>Ofrece tus servicios y<br><em>consigue nuevos clientes.</em></h1>
+    <p>Recibe solicitudes reales, envía ofertas y aumenta tus ingresos registrándote como profesional.</p>
+    <ul class="feature-list">
+        <li>Profesionales verificados</li>
+        <li>Pagos protegidos</li>
+        <li>Reseñas reales</li>
+        <li>Sin comisiones ocultas</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Ocultar campo tipo_usuario del form base, lo manejamos con tabs */
+    #id_tipo_usuario { display: none; }
+    label[for="id_tipo_usuario"] { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Crear cuenta</h2>
+
+<!-- Tabs Cliente / Profesional -->
+<div class="tabs" id="tipotabs">
+    <a href="{% url 'usuarios:registro' %}" class="tab-btn active" id="tab-cliente" onclick="setTipo('cliente')">Cliente</a>
+    <a href="{% url 'usuarios:registro' %}" class="tab-btn" id="tab-profesional" onclick="setTipo('profesional')">Profesional</a>
+</div>
+
+<form method="POST" novalidate id="registroForm">
+    {% csrf_token %}
+    <input type="hidden" name="tipo_usuario" id="tipo_usuario_hidden" value="cliente">
+
+    <div class="row">
+        <div class="form-group">
+            <label>Nombre</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}<ul class="errorlist">{% for e in form.nombre.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+            <label>Apellido</label>
+            {{ form.apellido }}
+            {% if form.apellido.errors %}<ul class="errorlist">{% for e in form.apellido.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Correo electrónico</label>
+        {{ form.correo }}
+        {% if form.correo.errors %}<ul class="errorlist">{% for e in form.correo.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Teléfono</label>
+            {{ form.telefono }}
+            {% if form.telefono.errors %}<ul class="errorlist">{% for e in form.telefono.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+            <label>Dirección</label>
+            {{ form.direccion }}
+            {% if form.direccion.errors %}<ul class="errorlist">{% for e in form.direccion.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Contraseña</label>
+            {{ form.password }}
+            {% if form.password.errors %}<ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+            <label>Confirmar contraseña</label>
+            {{ form.confirmar_password }}
+            {% if form.confirmar_password.errors %}<ul class="errorlist">{% for e in form.confirmar_password.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+    </div>
+
+    {% if form.non_field_errors %}
+        <ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <button type="submit" class="btn" id="btnRegistro">Continuar registro</button>
+</form>
+
+<div class="links">
+    <span>¿Ya tienes cuenta?</span> <a href="{% url 'usuarios:login' %}">Inicia sesión</a>
+</div>
+
+<script>
+    function setTipo(tipo) {
+        document.getElementById('tipo_usuario_hidden').value = tipo;
+        document.getElementById('tab-cliente').classList.toggle('active', tipo === 'cliente');
+        document.getElementById('tab-profesional').classList.toggle('active', tipo === 'profesional');
+        // Cambiar texto del botón
+        const btn = document.getElementById('btnRegistro');
+        btn.textContent = tipo === 'profesional' ? 'Continuar → Perfil profesional' : 'Crear cuenta';
+    }
+
+    // Mantener estado del tab si hay errores de validación
+    const tipoActual = '{{ form.tipo_usuario.value|default:"cliente" }}';
+    if (tipoActual === 'profesional') setTipo('profesional');
+
+    // Evitar navegación al hacer clic en tabs, solo cambiar estado
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+        });
+    });
+</script>
+{% endblock %}

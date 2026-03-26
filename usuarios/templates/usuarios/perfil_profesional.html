@@ -1,0 +1,75 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+{% block titulo %}- Perfil Profesional{% endblock %}
+{% block bg_image %}{% static 'usuarios/fondo1.jpg' %}{% endblock %}
+{% block card_class %}card-wide{% endblock %}
+
+{% block hero %}
+<div class="hero-left">
+    <h1>Tu perfil,<br><em>tu reputación.</em></h1>
+    <p>Un perfil completo genera más confianza. Los clientes eligen a los profesionales con más detalle en su presentación.</p>
+    <ul class="feature-list">
+        <li>Más visibilidad en búsquedas</li>
+        <li>Clientes que confían en tu experiencia</li>
+        <li>Mayor tasa de contratación</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<!-- Stepper -->
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px;">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:#0d0b07;">✓</div>
+    <span style="font-size:0.78rem;color:var(--gold);">Datos personales</span>
+    <div style="flex:1;max-width:40px;height:1px;background:var(--border);"></div>
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:#0d0b07;">2</div>
+    <span style="font-size:0.78rem;color:var(--gold);font-weight:500;">Perfil profesional</span>
+</div>
+
+<h2>Tu perfil profesional</h2>
+<p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:20px;">
+    Hola <strong style="color:var(--gold);">{{ usuario.nombre }}</strong>, cuéntanos sobre lo que ofreces.
+</p>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label>Tipo de servicio que brindas</label>
+        {{ form.servicio }}
+        {% if form.servicio.errors %}<ul class="errorlist">{% for e in form.servicio.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Descripción del servicio</label>
+        {{ form.servicio_descripcion }}
+        {% if form.servicio_descripcion.errors %}<ul class="errorlist">{% for e in form.servicio_descripcion.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Años de experiencia</label>
+        {{ form.anos_experiencia }}
+        {% if form.anos_experiencia.errors %}<ul class="errorlist">{% for e in form.anos_experiencia.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Historial profesional</label>
+        {{ form.historial }}
+        <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;display:block;">Proyectos, empleos anteriores, logros relevantes.</span>
+        {% if form.historial.errors %}<ul class="errorlist">{% for e in form.historial.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Certificaciones o estudios <span style="color:var(--text-muted);font-size:0.7rem;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        {{ form.certificaciones }}
+        {% if form.certificaciones.errors %}<ul class="errorlist">{% for e in form.certificaciones.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div style="background:var(--gold-dim);border:1px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:0.8rem;color:var(--gold-light);">
+        📧 Al guardar recibirás un correo para activar tu cuenta. Un administrador aprobará tu registro.
+    </div>
+
+    <button type="submit" class="btn">Guardar perfil y finalizar</button>
+</form>
+{% endblock %}

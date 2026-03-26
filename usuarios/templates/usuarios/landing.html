@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home+ | Servicios confiables para tu hogar</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                beige: '#CCB58E',
+                beigdark: '#B89D71',
+                blacksoft: '#1F1F1F'
+            }
+        }
+    }
+}
+</script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+.bubble{
+position:absolute;
+background:rgba(255,255,255,0.10);
+border-radius:50%;
+filter:blur(18px);
+animation:bubbleFloat 16s infinite alternate ease-in-out;
+pointer-events:none;
+}
+.b1{width:180px;height:180px;top:20%;left:5%;}
+.b2{width:240px;height:240px;bottom:10%;right:8%;}
+.b3{width:130px;height:130px;bottom:25%;left:15%;}
+@keyframes bubbleFloat{
+0%{transform:translateY(0px);}
+100%{transform:translateY(-40px);}
+}
+</style>
+</head>
+
+<body class="bg-blacksoft text-white overflow-x-hidden">
+
+<!-- NAVBAR -->
+<header class="fixed top-0 left-0 w-full z-[999] backdrop-blur-lg bg-black/40 border-b border-white/10">
+<div class="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
+<div class="text-xl font-extrabold tracking-wide">
+Home<span class="text-beige">+</span>
+</div>
+
+<nav class="hidden md:flex items-center gap-6 text-sm">
+<a href="#sobre" class="hover:text-beige transition">Sobre</a>
+<a href="#beneficios" class="hover:text-beige transition">Beneficios</a>
+<a href="#opiniones" class="hover:text-beige transition">Opiniones</a>
+
+<a href="{% url 'usuarios:registro' %}" class="px-4 py-2 rounded-full border border-beige hover:bg-white/5 transition">
+Crear cuenta
+</a>
+
+<a href="{% url 'usuarios:login' %}" class="px-4 py-2 rounded-full bg-beige text-blacksoft font-semibold hover:bg-beigdark transition">
+Iniciar sesión
+</a>
+</nav>
+
+<button id="menuBtn" class="md:hidden text-2xl text-white z-[1000]">
+<i class="fas fa-bars"></i>
+</button>
+
+</div>
+
+<div id="mobileMenu" class="hidden md:hidden fixed top-16 left-0 w-full bg-black/95 backdrop-blur-xl border-t border-white/10 px-6 py-8 space-y-6 text-center z-[998]">
+<a href="#sobre" class="block hover:text-beige">Sobre</a>
+<a href="#beneficios" class="block hover:text-beige">Beneficios</a>
+<a href="#opiniones" class="block hover:text-beige">Opiniones</a>
+
+<div class="pt-4 space-y-4">
+<a href="{% url 'usuarios:registro' %}" class="block px-6 py-3 rounded-full border border-beige">
+Crear cuenta
+</a>
+<a href="{% url 'usuarios:login' %}" class="block px-6 py-3 rounded-full bg-beige text-blacksoft font-semibold">
+Iniciar sesión
+</a>
+</div>
+</div>
+</header>
+
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+
+<!-- HERO -->
+<section class="relative min-h-screen flex items-center justify-center pt-20">
+<div class="absolute inset-0">
+<img src="{% static 'usuarios/hero_home.jpg' %}" class="w-full h-full object-cover">
+<div class="absolute inset-0 bg-black/70"></div>
+</div>
+
+<div class="relative max-w-4xl mx-auto px-6 text-center">
+<div class="backdrop-blur-xl bg-black/60 border border-white/20 rounded-3xl p-8 md:p-12 shadow-2xl">
+
+<div class="inline-flex items-center gap-2 px-4 py-1 mb-6 rounded-full bg-white/10 text-sm border border-white/20">
+<i class="fas fa-shield-heart text-beige"></i>
+Plataforma segura para servicios del hogar
+</div>
+
+<div class="flex justify-center mb-8">
+<div class="relative bg-white/10 p-1 rounded-full flex w-[320px]">
+<span id="switchSlider"
+class="absolute left-1 top-1 bottom-1 w-1/2 bg-beige rounded-full transition-all duration-500"></span>
+
+<button id="btnCliente"
+class="relative w-1/2 py-2 font-semibold z-10 text-blacksoft">
+Cliente
+</button>
+
+<button id="btnPro"
+class="relative w-1/2 py-2 font-semibold z-10 text-white">
+Profesional
+</button>
+</div>
+</div>
+
+<div id="heroContent" class="transition-all duration-500">
+
+<h1 id="heroTitle"
+class="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight">
+Servicios confiables para tu hogar, en minutos.
+</h1>
+
+<p id="heroText" class="mt-6 text-base md:text-lg text-gray-300">
+Publica lo que necesitas, recibe ofertas de profesionales verificados
+y paga de forma segura sin salir de casa.
+</p>
+
+<a id="heroButton"
+href="{% url 'usuarios:registro' %}"
+class="inline-block mt-8 px-8 py-3 bg-beige text-blacksoft font-bold rounded-full hover:bg-beigdark transition shadow-lg">
+Comenzar como cliente
+</a>
+
+<div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-gray-300">
+<span><i class="fas fa-user-check text-beige"></i> Profesionales verificados</span>
+<span><i class="fas fa-star text-beige"></i> Reseñas reales</span>
+<span><i class="fas fa-lock text-beige"></i> Pagos protegidos</span>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section id="sobre" class="py-24 bg-blacksoft">
+<div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+
+<div>
+<div class="bg-white/5 backdrop-blur-lg border border-white/20 p-8 rounded-2xl shadow-xl">
+<h2 class="text-3xl font-bold mb-4">
+¿Qué es Home<span class="text-beige">+</span>?
+</h2>
+
+<p class="text-gray-300 leading-relaxed">
+Conectamos personas que necesitan ayuda en el hogar
+con profesionales confiables en plomería, electricidad,
+carpintería, pintura y más.
+</p>
+
+<p class="text-gray-400 mt-4">
+Tú describes el problema. Nosotros conectamos al profesional correcto.
+</p>
+</div>
+</div>
+
+<div>
+<img src="{% static 'usuarios/flow.png' %}"
+class="rounded-3xl shadow-2xl w-full">
+</div>
+
+</div>
+</section>
+
+<section id="beneficios" class="py-24">
+<div class="max-w-6xl mx-auto px-6 text-center">
+<h2 class="text-3xl md:text-4xl font-bold mb-12">
+¿Por qué elegir Home<span class="text-beige">+</span>?
+</h2>
+
+<div class="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20 backdrop-blur-lg">
+<img src="{% static 'usuarios/icons/verificados.png' %}" class="w-16 mx-auto mb-4">
+<h3>Profesionales verificados</h3>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20 backdrop-blur-lg">
+<img src="{% static 'usuarios/icons/rapido.png' %}" class="w-16 mx-auto mb-4">
+<h3>Respuesta rápida</h3>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20 backdrop-blur-lg">
+<img src="{% static 'usuarios/icons/resenas.png' %}" class="w-16 mx-auto mb-4">
+<h3>Reseñas reales</h3>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20 backdrop-blur-lg">
+<img src="{% static 'usuarios/icons/pagos.png' %}" class="w-16 mx-auto mb-4">
+<h3>Pagos protegidos</h3>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="opiniones" class="py-24 bg-blacksoft">
+<div class="max-w-6xl mx-auto px-6 text-center">
+
+<h2 class="text-3xl md:text-4xl font-bold mb-12">
+Lo que dicen nuestros usuarios
+</h2>
+
+<div class="grid md:grid-cols-3 gap-8 text-left">
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20">
+<div class="flex text-beige mb-3">
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="fas fa-star"></i>
+</div>
+<p class="text-gray-300 mb-4">
+“Encontré electricista en el mismo día. Súper fácil.”
+</p>
+<span class="text-beige text-sm">— Laura M.</span>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20">
+<div class="flex text-beige mb-3">
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="fas fa-star-half-stroke"></i>
+</div>
+<p class="text-gray-300 mb-4">
+“Como profesional conseguí 5 clientes la primera semana.”
+</p>
+<span class="text-beige text-sm">— Carlos R.</span>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/20">
+<div class="flex text-beige mb-3">
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="fas fa-star"></i><i class="fas fa-star"></i>
+<i class="far fa-star"></i>
+</div>
+<p class="text-gray-300 mb-4">
+“Los pagos protegidos me dieron mucha tranquilidad.”
+</p>
+<span class="text-beige text-sm">— Ana P.</span>
+</div>
+
+</div>
+</div>
+</section>
+
+<footer class="py-8 text-center text-gray-400 border-t border-white/10">
+© 2025 Home+. Todos los derechos reservados.
+</footer>
+
+<script>
+// MENU RESPONSIVE
+const menuBtn = document.getElementById("menuBtn");
+const mobileMenu = document.getElementById("mobileMenu");
+const icon = menuBtn.querySelector("i");
+
+menuBtn.addEventListener("click", () => {
+  mobileMenu.classList.toggle("hidden");
+  icon.classList.toggle("fa-bars");
+  icon.classList.toggle("fa-xmark");
+});
+
+// HERO SWITCH
+const btnCliente=document.getElementById("btnCliente");
+const btnPro=document.getElementById("btnPro");
+const heroTitle=document.getElementById("heroTitle");
+const heroText=document.getElementById("heroText");
+const heroButton=document.getElementById("heroButton");
+const slider=document.getElementById("switchSlider");
+const heroContent=document.getElementById("heroContent");
+
+function animateChange(callback){
+heroContent.classList.add("opacity-0","translate-y-4");
+setTimeout(()=>{
+callback();
+heroContent.classList.remove("opacity-0","translate-y-4");
+},250);
+}
+
+btnCliente.addEventListener("click",()=>{
+slider.style.transform="translateX(0%)";
+btnCliente.classList.add("text-blacksoft");
+btnCliente.classList.remove("text-white");
+btnPro.classList.remove("text-blacksoft");
+btnPro.classList.add("text-white");
+
+animateChange(()=>{
+heroTitle.textContent="Servicios confiables para tu hogar, en minutos.";
+heroText.textContent="Publica lo que necesitas, recibe ofertas de profesionales verificados y paga de forma segura sin salir de casa.";
+heroButton.textContent="Comenzar como cliente";
+});
+});
+
+btnPro.addEventListener("click",()=>{
+slider.style.transform="translateX(100%)";
+btnPro.classList.add("text-blacksoft");
+btnPro.classList.remove("text-white");
+btnCliente.classList.remove("text-blacksoft");
+btnCliente.classList.add("text-white");
+
+animateChange(()=>{
+heroTitle.textContent="Consigue nuevos clientes y aumenta tus ingresos.";
+heroText.textContent="Accede a solicitudes reales y recibe pagos seguros dentro de la plataforma.";
+heroButton.textContent="Comenzar como profesional";
+});
+});
+</script>
+
+</body>
+</html>
