@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Editar Servicio | Home+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+<style>
+
+/* INPUTS IGUAL QUE DASHBOARD */
+input, select, textarea {
+width:100%;
+margin-top:6px;
+background:rgba(0,0,0,0.6);
+padding:16px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.1);
+color:#E5E7EB;
+outline:none;
+transition:0.2s;
+font-size:15px;
+}
+
+input::placeholder,
+textarea::placeholder{
+color:rgba(255,255,255,0.4);
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+border-color:#CCB58E;
+box-shadow:0 0 0 2px rgba(204,181,142,0.3);
+background:rgba(0,0,0,0.85);
+color:white;
+}
+
+input[type="checkbox"]{
+width:auto;
+accent-color:#CCB58E;
+}
+
+input[type="file"]{
+background:transparent;
+border:none;
+padding:0;
+color:#9CA3AF;
+}
+
+/* LABEL */
+.label-pro{
+font-size:13px;
+color:#9CA3AF;
+}
+
+/* BOTONES */
+.btn-pro{
+background:#CCB58E;
+color:#1F1F1F;
+padding:14px;
+border-radius:14px;
+font-weight:600;
+transition:0.3s;
+}
+
+.btn-pro:hover{
+background:#B89D71;
+transform:scale(1.02);
+}
+
+.btn-cancel{
+background:rgba(255,255,255,0.1);
+padding:14px;
+border-radius:14px;
+text-align:center;
+transition:0.3s;
+}
+
+.btn-cancel:hover{
+background:rgba(255,255,255,0.2);
+}
+
+</style>
+
+</head>
+
+<body class="bg-blacksoft text-white flex justify-center items-center min-h-screen">
+
+<div class="bg-white/5 p-10 rounded-2xl border border-white/10 w-full max-w-2xl">
+
+<h2 class="text-3xl font-bold mb-8">Editar Servicio</h2>
+
+<form method="POST" enctype="multipart/form-data"
+      action="{% url 'servicios:editar' servicio.id_servicio %}"
+      class="space-y-6">
+
+{% csrf_token %}
+
+<div>
+<label class="label-pro">Categoría</label>
+{{ form.categoria }}
+</div>
+
+<div>
+<label class="label-pro">Título</label>
+{{ form.titulo }}
+</div>
+
+<div>
+<label class="label-pro">Descripción</label>
+{{ form.descripcion }}
+</div>
+
+<div>
+<label class="label-pro">Urgencia</label>
+{{ form.urgencia }}
+</div>
+
+<div class="flex items-center gap-2">
+{{ form.requiere_visita }}
+<span class="text-sm text-gray-400">Requiere visita</span>
+</div>
+
+<div id="campo_fecha">
+<label class="label-pro">Fecha de visita</label>
+{{ form.fecha_visita }}
+</div>
+
+<div>
+<label class="label-pro">Ciudad</label>
+{{ form.ciudad }}
+</div>
+
+<div>
+<label class="label-pro">Dirección</label>
+{{ form.direccion }}
+</div>
+
+<div>
+<label class="label-pro">Referencia</label>
+{{ form.referencia }}
+</div>
+
+<!-- IMAGEN -->
+<div>
+<label class="label-pro">Imagen</label>
+{{ form.imagen }}
+</div>
+
+{% if servicio.imagen %}
+<div>
+<p class="text-sm text-gray-400 mb-2">Imagen actual</p>
+<img src="{{ servicio.imagen.url }}" class="h-48 w-full object-cover rounded-xl border border-white/10">
+</div>
+{% endif %}
+
+<!-- BOTONES -->
+<div class="flex gap-4 mt-6">
+
+<button type="submit" class="btn-pro w-full">
+Guardar cambios
+</button>
+
+<a href="{% url 'servicios:dashboard' %}" class="btn-cancel w-full">
+Cancelar
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+<!-- JS VISITA -->
+<script>
+
+const checkbox = document.getElementById("id_requiere_visita");
+const campoFecha = document.getElementById("campo_fecha");
+
+function toggleFecha(){
+if(checkbox && checkbox.checked){
+campoFecha.style.display="block";
+}else{
+campoFecha.style.display="none";
+}
+}
+
+if(checkbox){
+checkbox.addEventListener("change", toggleFecha);
+}
+
+window.onload = toggleFecha;
+
+</script>
+
+</body>
+</html>

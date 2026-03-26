@@ -1,0 +1,16 @@
+<form method="POST">
+{% csrf_token %}
+
+<label>Fecha de visita</label>
+
+<input 
+type="datetime-local" 
+name="fecha" 
+required
+class="bg-black/40 p-3 rounded-lg border border-white/10 w-full mb-4">
+
+<button class="bg-beige text-blacksoft px-4 py-2 rounded-lg">
+Agendar visita
+</button>
+
+</form>

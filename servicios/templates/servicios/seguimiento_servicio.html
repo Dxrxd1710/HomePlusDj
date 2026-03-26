@@ -1,0 +1,265 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Seguimiento | Home+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+</head>
+
+<body class="bg-blacksoft text-white p-10">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-10">
+
+<h1 class="text-3xl font-bold">
+Seguimiento del servicio
+</h1>
+
+<a href="{% url 'servicios:dashboard' %}"
+class="text-gray-400 hover:text-white text-sm">
+← Volver
+</a>
+
+</div>
+
+<!-- INFO SERVICIO -->
+<div class="bg-white/5 p-8 rounded-2xl border border-white/10 space-y-4">
+
+<h2 class="text-2xl font-semibold">{{ servicio.titulo }}</h2>
+
+<p class="text-gray-400">{{ servicio.descripcion }}</p>
+
+<div class="grid md:grid-cols-2 gap-4 mt-4">
+
+<div>
+<p class="text-xs text-gray-400">Categoría</p>
+<p>{{ servicio.get_categoria_display }}</p>
+</div>
+
+<div>
+<p class="text-xs text-gray-400">Urgencia</p>
+<p>{{ servicio.get_urgencia_display }}</p>
+</div>
+
+<div>
+<p class="text-xs text-gray-400">Ciudad</p>
+<p>{{ servicio.ciudad }}</p>
+</div>
+
+<div>
+<p class="text-xs text-gray-400">Dirección</p>
+<p>{{ servicio.direccion }}</p>
+</div>
+
+<div>
+<p class="text-xs text-gray-400">Estado</p>
+
+{% if servicio.estado == 'publicado' %}
+<p class="text-yellow-400">Pendiente</p>
+{% elif servicio.estado == 'proceso' %}
+<p class="text-blue-400">En proceso</p>
+{% elif servicio.estado == 'finalizado' %}
+<p class="text-green-400">Finalizado</p>
+{% endif %}
+
+</div>
+
+</div>
+
+{% if servicio.requiere_visita %}
+<p class="mt-4 text-yellow-400">
+⚠ Este servicio requiere visita de diagnóstico
+</p>
+{% endif %}
+
+</div>
+
+{% if usuario.tipo_usuario == 'cliente' and servicio.estado == 'proceso' %}
+
+<div class="mt-8 bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h2 class="text-xl font-semibold mb-4">
+Método de pago
+</h2>
+
+<form method="POST" action="{% url 'servicios:seleccionar_pago' servicio.id_servicio %}">
+{% csrf_token %}
+
+<div class="space-y-3">
+
+<label class="flex items-center gap-3">
+<input type="radio" name="metodo_pago" value="efectivo">
+Efectivo
+</label>
+
+<label class="flex items-center gap-3">
+<input type="radio" name="metodo_pago" value="transferencia">
+Transferencia
+</label>
+
+</div>
+
+<button class="mt-4 bg-beige text-blacksoft px-6 py-2 rounded-lg font-semibold hover:bg-beigdark">
+Confirmar método de pago
+</button>
+
+</form>
+
+</div>
+
+{% endif %}
+{% if servicio.metodo_pago %}
+
+<div class="mt-4 text-sm text-green-400">
+✔ Método de pago: {{ servicio.get_metodo_pago_display }}
+</div>
+
+{% endif %}
+
+{% if servicio.metodo_pago %}
+
+<div class="mt-6">
+
+<a href="{% url 'servicios:generar_contrato' servicio.id_servicio %}"
+class="bg-blue-500 px-6 py-2 rounded-lg font-semibold hover:bg-blue-600">
+
+Descargar contrato
+
+</a>
+
+</div>
+
+{% endif %}
+
+<!-- 🔥 CONTRATO -->
+{% if usuario.tipo_usuario == 'cliente' and servicio.estado != 'finalizado' %}
+
+<div class="mt-8 bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h2 class="text-xl font-semibold mb-4">
+Subir contrato
+</h2>
+
+<form method="POST" enctype="multipart/form-data"
+action="{% url 'servicios:subir_contrato' servicio.id_servicio %}">
+
+{% csrf_token %}
+
+<input type="file" name="contrato"
+class="mb-4 block text-sm text-gray-300">
+
+<button class="bg-beige text-blacksoft px-6 py-2 rounded-lg font-semibold hover:bg-beigdark">
+Subir contrato
+</button>
+
+</form>
+
+</div>
+
+{% endif %}
+
+<!-- 🔥 MOSTRAR CONTRATO -->
+{% if servicio.contrato %}
+<div class="mt-4">
+<a href="{{ servicio.contrato.url }}" class="text-beige underline">
+Ver contrato
+</a>
+</div>
+{% endif %}
+
+<!-- 🔥 EVIDENCIAS -->
+{% if servicio.estado == 'proceso' %}
+
+<div class="mt-8 bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h2 class="text-xl font-semibold mb-4">
+Subir evidencias del trabajo
+</h2>
+
+<form method="POST" enctype="multipart/form-data"
+action="{% url 'servicios:subir_evidencia' servicio.id_servicio %}">
+
+{% csrf_token %}
+
+<input type="file" name="evidencia"
+class="mb-4 block text-sm text-gray-300">
+
+<button class="bg-beige text-blacksoft px-6 py-2 rounded-lg font-semibold hover:bg-beigdark">
+Subir evidencia
+</button>
+
+</form>
+
+</div>
+
+{% endif %}
+
+<!-- 🔥 LISTA DE EVIDENCIAS -->
+{% if evidencias %}
+
+<div class="mt-8">
+
+<h2 class="text-xl font-semibold mb-4">
+Evidencias subidas
+</h2>
+
+<div class="grid md:grid-cols-3 gap-4">
+
+{% for ev in evidencias %}
+
+<div class="bg-white/5 p-3 rounded-xl border border-white/10">
+
+<a href="{{ ev.archivo.url }}" target="_blank">
+Ver archivo
+</a>
+
+<p class="text-xs text-gray-400 mt-2">
+{{ ev.fecha }}
+</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endif %}
+
+<!-- 🔥 FINALIZAR -->
+{% if usuario.tipo_usuario == 'cliente' and servicio.estado == 'proceso' %}
+
+<div class="mt-10">
+
+<a href="{% url 'servicios:finalizar' servicio.id_servicio %}"
+class="bg-green-500 px-6 py-3 rounded-lg font-semibold hover:bg-green-600">
+Finalizar servicio
+</a>
+
+</div>
+
+{% endif %}
+
+</body>
+</html>

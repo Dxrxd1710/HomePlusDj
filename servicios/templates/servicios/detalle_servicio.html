@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Detalle Servicio | Home+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+</head>
+
+<body class="bg-blacksoft text-white">
+
+<div class="max-w-6xl mx-auto p-8">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-10">
+<h1 class="text-3xl font-bold">{{ servicio.titulo }}</h1>
+
+<a href="{% url 'servicios:dashboard_profesional' %}"
+class="text-sm text-gray-400 hover:text-beige">
+← Volver
+</a>
+</div>
+
+<!-- GRID -->
+<div class="grid md:grid-cols-2 gap-10">
+
+<!-- IMAGEN -->
+<div class="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+{% if servicio.imagen %}
+<img src="{{ servicio.imagen.url }}" class="w-full h-80 object-cover">
+{% else %}
+<img src="{% static 'img/default.jpg' %}" class="w-full h-80 object-cover">
+{% endif %}
+</div>
+
+<!-- INFO + FORM -->
+<div>
+
+<!-- DESCRIPCIÓN COMPLETA -->
+<div class="bg-white/5 p-6 rounded-xl border border-white/10 mb-6">
+<h3 class="text-lg font-semibold mb-2 text-beige">Descripción</h3>
+<p class="text-gray-300 leading-relaxed">
+{{ servicio.descripcion }}
+</p>
+</div>
+
+<!-- DATOS -->
+<div class="grid grid-cols-2 gap-4 mb-6">
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-xs text-gray-400">Ciudad</p>
+<p class="font-semibold">{{ servicio.ciudad }}</p>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-xs text-gray-400">Dirección</p>
+<p class="font-semibold">{{ servicio.direccion }}</p>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-xs text-gray-400">Categoría</p>
+<p class="font-semibold">{{ servicio.get_categoria_display }}</p>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-xs text-gray-400">Urgencia</p>
+<p class="font-semibold">{{ servicio.get_urgencia_display }}</p>
+</div>
+
+</div>
+
+<!-- FORM APLICAR -->
+{% if not ya_aplico %}
+
+<form method="POST" action="{% url 'servicios:aplicar' servicio.id_servicio %}">
+{% csrf_token %}
+
+{% if servicio.requiere_visita %}
+
+<!-- INFO CLIENTE -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 mb-4">
+<p class="text-xs text-gray-400">Fecha sugerida por el cliente</p>
+<p class="font-semibold">
+{{ servicio.fecha_visita|default:"No definida" }}
+</p>
+</div>
+
+<!-- FECHA PROFESIONAL -->
+<label class="text-sm text-gray-400">
+Confirma o ajusta la fecha
+</label>
+
+<input type="datetime-local"
+name="fecha_propuesta"
+class="w-full mt-2 mb-4 p-3 bg-black/40 border border-white/10 rounded-lg"
+value="{{ servicio.fecha_visita|date:'Y-m-d\\TH:i' }}"
+required>
+
+<!-- COSTO -->
+<label class="text-sm text-gray-400">
+Costo de la visita
+</label>
+
+<input type="number"
+name="costo"
+class="w-full mt-2 mb-6 p-3 bg-black/40 border border-white/10 rounded-lg"
+placeholder="Ej: 50000"
+required>
+
+{% endif %}
+
+<!-- BOTÓN -->
+<button type="submit"
+class="w-full bg-beige text-blacksoft px-6 py-3 rounded-lg font-semibold hover:bg-beigdark transition">
+
+<i class="fas fa-paper-plane mr-2"></i>
+Aplicar
+
+</button>
+
+</form>
+
+{% else %}
+
+<p class="text-green-400 font-semibold mt-6">
+✔ Ya aplicaste a este servicio
+</p>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

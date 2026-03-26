@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Calificar servicio</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+</head>
+
+<body class="bg-blacksoft text-white flex items-center justify-center h-screen">
+
+<form method="POST" class="bg-white/5 p-8 rounded-2xl border border-white/10 w-[400px]">
+{% csrf_token %}
+
+<h2 class="text-2xl font-bold mb-6">Calificar servicio</h2>
+
+<label class="text-sm text-gray-400">Puntuación</label>
+<select name="puntuacion" class="w-full p-3 rounded-lg bg-black/40 border border-white/10 mb-4">
+<option value="5">⭐⭐⭐⭐⭐</option>
+<option value="4">⭐⭐⭐⭐</option>
+<option value="3">⭐⭐⭐</option>
+<option value="2">⭐⭐</option>
+<option value="1">⭐</option>
+</select>
+
+<label class="text-sm text-gray-400">Comentario</label>
+<textarea name="comentario" class="w-full p-3 rounded-lg bg-black/40 border border-white/10 mb-6"></textarea>
+
+<button class="bg-beige text-blacksoft w-full py-3 rounded-lg font-semibold">
+Enviar calificación
+</button>
+
+</form>
+
+</body>
+</html>

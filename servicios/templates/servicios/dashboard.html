@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtxL2APr_3rk2v6SFZObtTUWpTlTCHeu4&libraries=places"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Cliente | Home+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+
+/* SECCIONES */
+.section{display:none;}
+.section.active{display:block;}
+
+/* CARDS */
+.card{
+transition:0.3s;
+}
+.card:hover{
+transform:translateY(-6px) scale(1.02);
+box-shadow:0 15px 40px rgba(0,0,0,0.5);
+}
+
+/* SIDEBAR */
+.nav-btn{
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px;
+border-radius:12px;
+transition:0.3s;
+width:100%;
+font-weight:500;
+}
+
+.nav-btn:hover{
+background:rgba(255,255,255,0.05);
+color:#CCB58E;
+}
+
+.nav-active{
+background:rgba(255,255,255,0.08);
+color:#CCB58E;
+}
+
+/* INPUTS */
+input, select, textarea {
+width:100%;
+margin-top:6px;
+background:rgba(0,0,0,0.6);
+padding:16px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.1);
+color:#E5E7EB;
+outline:none;
+transition:0.2s;
+font-size:15px;
+}
+
+input::placeholder,
+textarea::placeholder{
+color:rgba(255,255,255,0.4);
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+border-color:#CCB58E;
+box-shadow:0 0 0 2px rgba(204,181,142,0.3);
+background:rgba(0,0,0,0.85);
+color:white;
+}
+
+input[type="checkbox"]{
+width:auto;
+accent-color:#CCB58E;
+}
+
+input[type="file"]{
+background:transparent;
+border:none;
+padding:0;
+color:#9CA3AF;
+}
+
+/* LABELS */
+.label-pro{
+font-size:13px;
+color:#9CA3AF;
+}
+
+/* BOTÓN */
+.btn-pro{
+background:#CCB58E;
+color:#1F1F1F;
+padding:14px;
+border-radius:14px;
+font-weight:600;
+transition:0.3s;
+}
+
+.btn-pro:hover{
+background:#B89D71;
+transform:scale(1.02);
+}
+
+/* MODAL */
+.modal{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body class="bg-blacksoft text-white">
+
+<!-- SIDEBAR -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-black/80 backdrop-blur-xl border-r border-white/10 p-6 flex flex-col justify-between">
+
+<div>
+<div class="text-2xl font-extrabold mb-10">
+Home<span class="text-beige">+</span>
+</div>
+
+<nav class="space-y-3 text-sm">
+
+<button onclick="showSection('dashboard', this)" class="nav-btn nav-active">
+<i class="fas fa-chart-line"></i> Dashboard
+</button>
+
+<button onclick="showSection('publicar', this)" class="nav-btn">
+<i class="fas fa-plus"></i> Publicar
+</button>
+
+<button onclick="showSection('editar', this)" class="nav-btn">
+<i class="fas fa-pen"></i> Servicios Publicados
+</button>
+
+<button onclick="showSection('historial', this)" class="nav-btn">
+<i class="fas fa-clock"></i> Historial
+</button>
+
+</nav>
+</div>
+
+<div>
+<button onclick="openLogoutModal()" class="nav-btn text-red-400 hover:text-red-300">
+<i class="fas fa-sign-out-alt"></i> Cerrar sesión
+</button>
+</div>
+
+</aside>
+
+<main class="ml-64 p-10">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-10">
+
+<h1 class="text-xl font-semibold text-gray-300">
+Panel del cliente
+</h1>
+
+<div class="flex items-center gap-4">
+
+<div class="text-right">
+<p class="font-semibold">{{ usuario.nombre }}</p>
+<p class="text-xs text-gray-400">Cliente</p>
+</div>
+
+<div class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border border-white/20 hover:scale-105 transition">
+<i class="fas fa-user text-gray-300"></i>
+</div>
+
+</div>
+
+</div>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+<h1 class="text-3xl font-bold mb-10">Panel</h1>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+<div onclick="showSection('publicar')" class="card bg-white/5 p-8 rounded-2xl border border-white/10 cursor-pointer">
+<i class="fas fa-plus text-beige text-2xl mb-4"></i>
+<h3 class="font-bold mb-2">Publicar servicio</h3>
+<p class="text-sm text-gray-400">
+Crea una nueva solicitud detallando lo que necesitas para recibir ayuda rápidamente.
+</p>
+</div>
+
+<div onclick="showSection('editar')" class="card bg-white/5 p-8 rounded-2xl border border-white/10 cursor-pointer">
+<i class="fas fa-pen text-beige text-2xl mb-4"></i>
+<h3 class="font-bold mb-2">Editar servicios</h3>
+<p class="text-sm text-gray-400">
+Modifica, actualiza o elimina tus servicios publicados en cualquier momento.
+</p>
+</div>
+
+<div onclick="showSection('historial')" class="card bg-white/5 p-8 rounded-2xl border border-white/10 cursor-pointer">
+<i class="fas fa-clock text-beige text-2xl mb-4"></i>
+<h3 class="font-bold mb-2">Historial</h3>
+<p class="text-sm text-gray-400">
+Consulta todos tus servicios, revisa su estado y filtra por urgencia o progreso.
+</p>
+</div>
+
+</div>
+</section>
+
+<!-- PUBLICAR -->
+<section id="publicar" class="section">
+
+<h1 class="text-3xl mb-8">Publicar servicio</h1>
+
+<form method="POST" enctype="multipart/form-data"
+onsubmit="return validarPublicacion()"
+class="space-y-6 max-w-2xl bg-white/5 p-10 rounded-2xl border border-white/10">
+
+{% csrf_token %}
+
+<div><label class="label-pro">Categoría</label>{{ form.categoria }}</div>
+<div><label class="label-pro">Título</label>{{ form.titulo }}</div>
+<div><label class="label-pro">Descripción</label>{{ form.descripcion }}</div>
+<div><label class="label-pro">Urgencia</label>{{ form.urgencia }}</div>
+
+<div class="flex items-center gap-2">
+{{ form.requiere_visita }}
+<span class="text-sm text-gray-400">Requiere visita</span>
+</div>
+
+<div><label class="label-pro">Fecha</label>{{ form.fecha_visita }}</div>
+
+<!-- CIUDAD OCULTA -->
+<input type="hidden" name="ciudad" value="Bogotá">
+
+<!-- LOCALIDAD -->
+<div>
+<label class="label-pro">Localidad</label>
+<input type="text" id="localidad" name="localidad" required>
+</div>
+
+<!-- BARRIO -->
+<div>
+<label class="label-pro">Barrio</label>
+<input type="text" id="barrio" name="barrio" required>
+</div>
+
+<!-- DIRECCIÓN -->
+<div>
+<label class="label-pro">Dirección</label>
+<input type="text" id="direccion" name="direccion"
+value="{{ usuario.direccion }}"
+placeholder="Ej: Calle 123 #45-67, Bogotá"
+required>
+</div>
+
+<div><label class="label-pro">Referencia</label>{{ form.referencia }}</div>
+
+<div>
+<label class="label-pro">Imagen</label>
+{{ form.imagen }}
+
+<div id="errorImagen" class="hidden mt-3 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm flex items-center gap-2">
+<i class="fas fa-exclamation-circle"></i>
+Debes subir una imagen para publicar el servicio
+</div>
+
+</div>
+
+<button class="btn-pro w-full">
+Publicar servicio
+</button>
+
+</form>
+
+<!-- CARGA MASIVA -->
+<div class="mt-10 max-w-2xl bg-white/5 p-10 rounded-2xl border border-white/10">
+
+<h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+<i class="fas fa-upload text-beige"></i>
+Carga masiva de servicios
+</h2>
+
+<form method="POST" enctype="multipart/form-data" action="{% url 'servicios:carga_masiva' %}">
+{% csrf_token %}
+
+<label class="label-pro">Archivo CSV</label>
+<input type="file" name="archivo" accept=".csv" required>
+
+<p class="text-xs text-gray-400 mt-2">
+Sube un archivo CSV para crear varios servicios automáticamente.
+</p>
+
+<button class="btn-pro w-full mt-6">
+Subir archivo
+</button>
+
+</form>
+
+</div>
+
+</section>
+
+<!-- EDITAR -->
+<section id="editar" class="section">
+<h1 class="text-3xl mb-8">Mira y edita tus Servicios Publicados</h1>
+<div class="grid md:grid-cols-3 gap-6">
+{% for servicio in servicios_editar %}
+<div class="card bg-white/5 p-4 rounded-xl border border-white/10">
+
+{% if servicio.imagen %}
+<img src="{{ servicio.imagen.url }}" class="h-40 w-full object-cover mb-3 rounded">
+{% endif %}
+
+<h3 class="font-bold">{{ servicio.titulo }}</h3>
+
+<div class="flex flex-wrap gap-2 mt-4">
+
+{% if servicio.estado == 'publicado' %}
+<a href="{% url 'servicios:editar' servicio.id_servicio %}" class="bg-blue-500 px-3 py-1 rounded text-xs">Editar</a>
+{% else %}
+<span class="bg-gray-600 px-3 py-1 rounded text-xs cursor-not-allowed opacity-50">No editable</span>
+{% endif %}
+
+{% if servicio.estado == 'finalizado' %}
+<a href="{% url 'servicios:calificar' servicio.id_servicio %}" class="bg-yellow-400 text-black px-3 py-1 rounded text-xs">Calificar</a>
+{% endif %}
+
+<a href="{% url 'servicios:eliminar' servicio.id_servicio %}" class="bg-red-500 px-3 py-1 rounded text-xs">Eliminar</a>
+
+<a href="{% url 'servicios:aplicaciones' servicio.id_servicio %}" class="bg-beige text-blacksoft px-3 py-1 rounded text-xs font-semibold hover:bg-beigdark transition">
+<i class="fas fa-users mr-1"></i> Ver profesionales
+</a>
+
+<a href="{% url 'servicios:seguimiento' servicio.id_servicio %}" class="bg-white/10 px-3 py-1 rounded-lg text-sm hover:bg-white/20">
+Ver seguimiento
+</a>
+
+</div>
+</div>
+{% endfor %}
+</div>
+</section>
+
+<!-- HISTORIAL -->
+<section id="historial" class="section">
+<h1 class="text-3xl mb-8">Historial</h1>
+
+<form method="GET" onsubmit="guardarSeccion('historial')" class="grid md:grid-cols-4 gap-4 mb-8">
+<input name="q" placeholder="Buscar...">
+<select name="urgencia">
+<option value="">Urgencia</option>
+<option value="baja">Baja</option>
+<option value="media">Media</option>
+<option value="alta">Alta</option>
+</select>
+<select name="estado">
+<option value="">Estado</option>
+<option value="publicado">Publicado</option>
+<option value="proceso">En proceso</option>
+<option value="finalizado">Finalizado</option>
+</select>
+<button class="btn-pro">Filtrar</button>
+</form>
+
+<div class="grid md:grid-cols-3 gap-6">
+{% for servicio in servicios %}
+<div class="card bg-white/5 p-4 rounded-xl border border-white/10">
+
+{% if servicio.imagen %}
+<img src="{{ servicio.imagen.url }}" class="h-40 w-full object-cover mb-3 rounded">
+{% endif %}
+
+<h3 class="font-bold">{{ servicio.titulo }}</h3>
+
+<p class="text-xs text-gray-400">
+{{ servicio.get_categoria_display }} | 
+{{ servicio.get_estado_display }} | 
+{{ servicio.get_urgencia_display }}
+</p>
+
+</div>
+{% endfor %}
+</div>
+</section>
+
+</main>
+
+<!-- MODAL -->
+<div id="logoutModal" class="modal fixed inset-0 bg-black/70 flex items-center justify-center">
+<div class="bg-blacksoft border border-white/10 p-8 rounded-2xl w-[400px] text-center">
+<h2 class="text-xl font-bold mb-4">¿Cerrar sesión?</h2>
+<p class="text-gray-400 mb-6">Se cerrará tu sesión actual</p>
+
+<div class="flex justify-center gap-4">
+<button onclick="closeLogoutModal()" class="px-4 py-2 bg-gray-600 rounded">Cancelar</button>
+<form method="POST" action="{% url 'usuarios:logout' %}">
+{% csrf_token %}
+<button class="px-4 py-2 bg-red-500 rounded">Sí, cerrar sesión</button>
+</form>
+</div>
+
+</div>
+</div>
+
+<script>
+
+function validarPublicacion(){
+let input = document.querySelector('input[type="file"]')
+let error = document.getElementById("errorImagen")
+
+if(!input.value){
+error.classList.remove("hidden")
+return false
+}
+
+error.classList.add("hidden")
+localStorage.setItem("seccionActiva", "editar")
+return true
+}
+
+function guardarSeccion(seccion){
+localStorage.setItem("seccionActiva", seccion)
+}
+
+function showSection(id, btn){
+guardarSeccion(id)
+
+document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"))
+document.getElementById(id).classList.add("active")
+
+document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("nav-active"))
+if(btn) btn.classList.add("nav-active")
+}
+
+// AUTOCOMPLETE SOLO BOGOTÁ
+function initAutocomplete() {
+const input = document.getElementById("direccion");
+const barrioInput = document.getElementById("barrio");
+const localidadInput = document.getElementById("localidad");
+
+if (!input) return;
+
+const autocomplete = new google.maps.places.Autocomplete(input, {
+componentRestrictions: { country: "co" },
+bounds: {
+north: 4.85,
+south: 4.45,
+east: -73.95,
+west: -74.25
+},
+strictBounds: true,
+fields: ["formatted_address", "address_components"],
+});
+
+autocomplete.addListener("place_changed", function () {
+const place = autocomplete.getPlace();
+
+if (!place.address_components) return;
+
+for (const comp of place.address_components) {
+
+if (comp.types.includes("sublocality") || comp.types.includes("neighborhood")) {
+barrioInput.value = comp.long_name;
+}
+
+if (comp.types.includes("sublocality_level_1")) {
+localidadInput.value = comp.long_name;
+}
+
+}
+});
+}
+
+window.onload = function(){
+document.getElementById("logoutModal").style.display = "none"
+
+let seccion = localStorage.getItem("seccionActiva") || "dashboard"
+
+document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"))
+document.getElementById(seccion).classList.add("active")
+
+initAutocomplete()
+}
+
+function openLogoutModal(){
+document.getElementById("logoutModal").style.display = "flex"
+}
+
+function closeLogoutModal(){
+document.getElementById("logoutModal").style.display = "none"
+}
+
+</script>
+
+</body>
+</html>

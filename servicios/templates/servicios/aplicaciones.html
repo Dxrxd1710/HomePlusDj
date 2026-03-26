@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Profesionales | Home+</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+beige:"#CCB58E",
+beigdark:"#B89D71",
+blacksoft:"#1F1F1F"
+}
+}
+}
+}
+</script>
+
+</head>
+
+<body class="bg-blacksoft text-white">
+
+<div class="max-w-5xl mx-auto p-8">
+
+<h1 class="text-3xl font-bold mb-8">
+Profesionales interesados
+</h1>
+
+<div class="space-y-6">
+
+{% for item in data %}
+
+<div class="bg-white/5 p-6 rounded-xl border border-white/10">
+
+<!-- INFO PROFESIONAL -->
+<h3 class="text-lg font-bold mb-2">
+{{ item.aplicacion.profesional.nombre }}
+</h3>
+
+<!-- VISITA -->
+{% if item.visita %}
+
+<p class="text-sm text-gray-400">
+📅 Fecha propuesta:
+<span class="text-white font-semibold">
+{{ item.visita.fecha_propuesta }}
+</span>
+</p>
+
+<p class="text-sm text-gray-400 mt-2">
+💰 Costo visita:
+<span class="text-beige font-semibold">
+${{ item.visita.costo }}
+</span>
+</p>
+
+{% endif %}
+
+<!-- ESTADO -->
+<p class="text-xs mt-2 text-gray-500">
+Estado: {{ item.aplicacion.get_estado_display }}
+</p>
+
+<!-- BOTÓN -->
+{% if item.aplicacion.estado == 'pendiente' %}
+
+<a href="{% url 'servicios:aceptar_profesional' item.aplicacion.id %}"
+
+class="inline-block mt-4 bg-beige text-blacksoft px-4 py-2 rounded-lg font-semibold hover:bg-beigdark transition">
+
+Aceptar profesional
+
+</a>
+
+{% elif item.aplicacion.estado == 'aceptado' %}
+
+<p class="text-green-400 font-semibold mt-4">
+✔ Profesional seleccionado
+</p>
+
+{% endif %}
+
+</div>
+
+{% empty %}
+
+<p>No hay profesionales aún</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</body>
+</html>
