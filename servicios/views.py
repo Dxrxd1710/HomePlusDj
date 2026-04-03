@@ -18,7 +18,6 @@ import requests
 from django.core.files.base import ContentFile
 
 
-
 # ─────────────────────────────────────────
 # DASHBOARD CLIENTE
 # ─────────────────────────────────────────
@@ -41,7 +40,7 @@ def dashboard(request):
     # 🟡 SOLO PARA EDITAR (excluye los ya calificados)
     servicios_editar = servicios.exclude(
         estado='finalizado',
-     calificacion__isnull=False
+        calificacion__isnull=False
     )
 
     # 🔍 BUSCADOR
@@ -99,15 +98,17 @@ def dashboard(request):
         form = ServicioForm()
 
     return render(request, 'servicios/dashboard.html', {
-    'usuario': usuario,
-    'servicios': servicios,          # 👉 historial (todo)
-    'servicios_editar': servicios_editar,  # 👉 editar filtrado
-    'form': form
-})
-    
+        'usuario': usuario,
+        'servicios': servicios,          # 👉 historial (todo)
+        'servicios_editar': servicios_editar,  # 👉 editar filtrado
+        'form': form
+    })
+
 # ─────────────────────────────────────────
-#CARGA MASIVA
+# CARGA MASIVA
 # ────────────────────────────────────────
+
+
 def carga_masiva(request):
     if request.method == "POST":
         archivo = request.FILES.get("archivo")
@@ -119,7 +120,8 @@ def carga_masiva(request):
             messages.error(request, "El archivo debe ser un CSV.")
             return redirect("servicios:dashboard")
 
-        usuario = get_object_or_404(Usuario, id_usuario=request.session['usuario_id'])
+        usuario = get_object_or_404(
+            Usuario, id_usuario=request.session['usuario_id'])
 
         try:
             archivo_decodificado = archivo.read().decode("utf-8").splitlines()
@@ -148,13 +150,16 @@ def carga_masiva(request):
                         respuesta = requests.get(url_imagen)
                         if respuesta.status_code == 200:
                             nombre_imagen = url_imagen.split("/")[-1]
-                            servicio.imagen.save(nombre_imagen, ContentFile(respuesta.content), save=False)
+                            servicio.imagen.save(nombre_imagen, ContentFile(
+                                respuesta.content), save=False)
                     except Exception as e:
-                        print(f"No se pudo descargar la imagen: {url_imagen} - {e}")
+                        print(
+                            f"No se pudo descargar la imagen: {url_imagen} - {e}")
 
                 servicio.save()
 
-            messages.success(request, "Servicios cargados correctamente con imágenes (si había URLs).")
+            messages.success(
+                request, "Servicios cargados correctamente con imágenes (si había URLs).")
 
         except Exception as e:
             messages.error(request, f"Error al cargar archivo: {e}")
@@ -164,6 +169,8 @@ def carga_masiva(request):
 # ─────────────────────────────────────────
 # EDITAR SERVICIO
 # ─────────────────────────────────────────
+
+
 @never_cache
 def editar_servicio(request, id):
 
@@ -178,7 +185,8 @@ def editar_servicio(request, id):
 
     # 🔒 BLOQUEO DE EDICIÓN
     if servicio.estado != 'publicado':
-        messages.error(request, "No puedes editar este servicio en su estado actual.")
+        messages.error(
+            request, "No puedes editar este servicio en su estado actual.")
         return redirect('servicios:dashboard')
 
     if request.method == 'POST':
@@ -365,23 +373,52 @@ def ver_aplicaciones(request, servicio_id):
 
     aplicaciones = Aplicacion.objects.filter(servicio=servicio)
 
-    # 🔥 unir con visita
     data = []
 
     for app in aplicaciones:
+
         visita = VisitaDiagnostico.objects.filter(
             servicio=servicio,
             profesional=app.profesional
         ).first()
 
+        # ⭐ promedio de calificación
+        promedio = Calificacion.objects.filter(
+            profesional=app.profesional
+        ).aggregate(Avg('puntuacion'))['puntuacion__avg']
+
         data.append({
             'aplicacion': app,
-            'visita': visita
+            'visita': visita,
+            'promedio': promedio
         })
+
+    # 🔎 FILTRO
+    filtro = request.GET.get('filtro')
+
+    if filtro == 'precio':
+        data = sorted(
+            data,
+            key=lambda x: x['visita'].costo if x['visita'] else 999999
+        )
+
+    elif filtro == 'fecha':
+        data = sorted(
+            data,
+            key=lambda x: x['visita'].fecha_propuesta if x['visita'] else ''
+        )
+
+    elif filtro == 'calificacion':
+        data = sorted(
+            data,
+            key=lambda x: x['promedio'] if x['promedio'] else 0,
+            reverse=True
+        )
 
     return render(request, 'servicios/aplicaciones.html', {
         'servicio': servicio,
-        'data': data
+        'data': data,
+        'filtro': filtro
     })
 
 
@@ -624,6 +661,8 @@ def generar_contrato(request, servicio_id):
 # ─────────────────────────────────────────
 # cerrar sesion
 # ─────────────────────────────────────────
+
+
 @never_cache
 def cerrar_sesion(request):
     logout(request)

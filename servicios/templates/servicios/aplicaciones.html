@@ -25,12 +25,52 @@ blacksoft:"#1F1F1F"
 </head>
 
 <body class="bg-blacksoft text-white">
+<a href="{% url 'servicios:dashboard' %}"
+class="mb-6 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg border border-white/10">
+←Volver
+</a>
 
 <div class="max-w-5xl mx-auto p-8">
 
 <h1 class="text-3xl font-bold mb-8">
+   
 Profesionales interesados
 </h1>
+<!-- FILTROS -->
+<div class="mb-8">
+
+<form method="GET" class="flex gap-4 items-center">
+
+<label class="text-sm text-gray-400">
+Ordenar por:
+</label>
+
+<select name="filtro"
+onchange="this.form.submit()"
+class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white">
+
+<option value="">Seleccionar</option>
+
+<option value="calificacion"
+{% if filtro == 'calificacion' %}selected{% endif %}>
+⭐ Mejor calificación
+</option>
+
+<option value="precio"
+{% if filtro == 'precio' %}selected{% endif %}>
+💰 Menor precio
+</option>
+
+<option value="fecha"
+{% if filtro == 'fecha' %}selected{% endif %}>
+📅 Fecha más cercana
+</option>
+
+</select>
+
+</form>
+
+</div>
 
 <div class="space-y-6">
 
@@ -39,9 +79,20 @@ Profesionales interesados
 <div class="bg-white/5 p-6 rounded-xl border border-white/10">
 
 <!-- INFO PROFESIONAL -->
-<h3 class="text-lg font-bold mb-2">
+<h3 class="text-lg font-bold mb-1">
 {{ item.aplicacion.profesional.nombre }}
 </h3>
+
+{% if item.promedio %}
+<p class="text-yellow-400 text-sm mb-2">
+⭐ {{ item.promedio|floatformat:1 }} / 5
+</p>
+{% else %}
+<p class="text-gray-500 text-sm mb-2">
+Sin calificaciones
+</p>
+{% endif %}
+
 
 <!-- VISITA -->
 {% if item.visita %}

@@ -24,12 +24,17 @@ urlpatterns = [
          views.subir_evidencia, name='subir_evidencia'),
     path('calificar/<int:id>/', views.calificar_servicio, name='calificar'),
     path('visita/<int:id>/', views.gestionar_visita, name='visita'),
-    path('pago/<int:servicio_id>/', views.seleccionar_pago, name='seleccionar_pago'),
-path('contrato/<int:servicio_id>/', views.generar_contrato, name='generar_contrato'),
-path("dashboard/", views.dashboard, name="dashboard"),
+    path('pago/<int:servicio_id>/',
+         views.seleccionar_pago, name='seleccionar_pago'),
+    path('contrato/<int:servicio_id>/',
+         views.generar_contrato, name='generar_contrato'),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("carga-masiva/", views.carga_masiva, name="carga_masiva"),
 
-path('logout/', views.cerrar_sesion, name='logout')
+    path('logout/', views.cerrar_sesion, name='logout'),
+
+
+
 
 
 
